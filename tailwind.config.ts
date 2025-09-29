@@ -73,6 +73,7 @@ export default {
         'gradient-secondary': 'var(--gradient-secondary)',
         'gradient-accent': 'var(--gradient-accent)',
         'gradient-rainbow': 'var(--gradient-rainbow)',
+        'gradient-ocean': 'var(--gradient-ocean)',
       },
       boxShadow: {
         'soft': 'var(--shadow-soft)',
