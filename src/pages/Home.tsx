@@ -14,65 +14,9 @@ import {
   Users
 } from "lucide-react";
 import heroImage from "@/assets/hero-bg.jpg";
-import featuredProductsImage from "@/assets/featured-products.jpg";
+import { featuredProducts, categories } from "@/data/staticData";
 
 const Home = () => {
-  // Mock data for featured products
-  const featuredProducts = [
-    {
-      id: "1",
-      name: "Premium Wireless Headphones",
-      price: 2999,
-      originalPrice: 3999,
-      image: featuredProductsImage,
-      rating: 4.5,
-      reviews: 128,
-      category: "Electronics",
-      isOnSale: true,
-      isFeatured: true,
-    },
-    {
-      id: "2", 
-      name: "Smart Fitness Watch",
-      price: 1999,
-      originalPrice: 2499,
-      image: featuredProductsImage,
-      rating: 4.3,
-      reviews: 89,
-      category: "Wearables",
-      isOnSale: true,
-    },
-    {
-      id: "3",
-      name: "Professional Camera Lens",
-      price: 15999,
-      image: featuredProductsImage,
-      rating: 4.8,
-      reviews: 45,
-      category: "Photography",
-      isFeatured: true,
-    },
-    {
-      id: "4",
-      name: "Gaming Mechanical Keyboard",
-      price: 4999,
-      originalPrice: 5999,
-      image: featuredProductsImage,
-      rating: 4.6,
-      reviews: 203,
-      category: "Gaming",
-      isOnSale: true,
-    },
-  ];
-
-  const categories = [
-    { name: "Electronics", icon: "📱", count: "1,234 items" },
-    { name: "Fashion", icon: "👕", count: "2,456 items" },
-    { name: "Home & Garden", icon: "🏠", count: "1,789 items" },
-    { name: "Sports", icon: "⚽", count: "987 items" },
-    { name: "Books", icon: "📚", count: "3,456 items" },
-    { name: "Beauty", icon: "💄", count: "1,567 items" },
-  ];
 
   const features = [
     {

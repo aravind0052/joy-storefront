@@ -20,7 +20,7 @@ import {
   Check
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import featuredProductsImage from "@/assets/featured-products.jpg";
+import { getProductById, products } from "@/data/staticData";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -29,80 +29,30 @@ const ProductDetail = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [isFavorited, setIsFavorited] = useState(false);
 
-  // Mock product data
-  const product = {
-    id: "1",
-    name: "Premium Wireless Headphones with Active Noise Cancellation",
-    price: 2999,
-    originalPrice: 3999,
-    images: [
-      featuredProductsImage,
-      featuredProductsImage,
-      featuredProductsImage,
-      featuredProductsImage,
-    ],
-    rating: 4.5,
-    reviews: 128,
-    category: "Electronics",
-    brand: "AudioTech",
-    stock: 15,
-    isOnSale: true,
-    features: [
-      "Active Noise Cancellation",
-      "30-hour battery life",
-      "Bluetooth 5.0",
-      "Premium leather ear cups",
-      "Built-in microphone",
-      "Foldable design"
-    ],
-    description: "Experience premium audio quality with our flagship wireless headphones. Featuring advanced active noise cancellation technology and premium materials for ultimate comfort during extended listening sessions.",
-    specifications: {
-      "Brand": "AudioTech",
-      "Model": "AT-PRO-2024",
-      "Color": "Midnight Black",
-      "Connectivity": "Wireless (Bluetooth 5.0)",
-      "Battery Life": "30 hours",
-      "Charging Time": "2 hours",
-      "Weight": "320g",
-      "Warranty": "2 years"
-    }
-  };
+  // Get product data from static data
+  const product = getProductById(id || "1");
+  
+  // Get related products (same category, different product)
+  const relatedProducts = products
+    .filter(p => p.category === product?.category && p.id !== product?.id)
+    .slice(0, 3);
 
-  // Mock related products
-  const relatedProducts = [
-    {
-      id: "2",
-      name: "Smart Fitness Watch",
-      price: 1999,
-      originalPrice: 2499,
-      image: featuredProductsImage,
-      rating: 4.3,
-      reviews: 89,
-      category: "Wearables",
-      isOnSale: true,
-    },
-    {
-      id: "3",
-      name: "Wireless Gaming Mouse",
-      price: 1599,
-      image: featuredProductsImage,
-      rating: 4.4,
-      reviews: 156,
-      category: "Gaming",
-    },
-    {
-      id: "4",
-      name: "Professional Camera Lens",
-      price: 15999,
-      image: featuredProductsImage,
-      rating: 4.8,
-      reviews: 45,
-      category: "Photography",
-      isFeatured: true,
-    },
-  ];
+  if (!product) {
+    return (
+      <div className="min-h-screen bg-background-soft flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Product Not Found</h1>
+          <Button asChild>
+            <Link to="/products">Back to Products</Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
-  const discountPercentage = Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
+  const discountPercentage = product.originalPrice 
+    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+    : 0;
 
   const handleAddToCart = () => {
     toast({
@@ -144,15 +94,16 @@ const ProductDetail = () => {
             {/* Main Image */}
             <div className="aspect-square rounded-2xl overflow-hidden bg-background shadow-soft">
               <img
-                src={product.images[selectedImage]}
+                src={product.images ? product.images[selectedImage] : product.image}
                 alt={product.name}
                 className="w-full h-full object-cover"
               />
             </div>
 
             {/* Thumbnail Images */}
-            <div className="grid grid-cols-4 gap-4">
-              {product.images.map((image, index) => (
+            {product.images && (
+              <div className="grid grid-cols-4 gap-4">
+                {product.images.map((image, index) => (
                 <button
                   key={index}
                   onClick={() => setSelectedImage(index)}
@@ -167,9 +118,10 @@ const ProductDetail = () => {
                     alt={`${product.name} ${index + 1}`}
                     className="w-full h-full object-cover"
                   />
-                </button>
-              ))}
-            </div>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Product Info */}
@@ -223,17 +175,19 @@ const ProductDetail = () => {
             </div>
 
             {/* Features */}
-            <div>
-              <h3 className="font-semibold mb-3">Key Features:</h3>
-              <ul className="space-y-2">
-                {product.features.map((feature, index) => (
-                  <li key={index} className="flex items-center gap-2 text-muted">
-                    <Check className="w-4 h-4 text-success" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            {product.features && (
+              <div>
+                <h3 className="font-semibold mb-3">Key Features:</h3>
+                <ul className="space-y-2">
+                  {product.features.map((feature, index) => (
+                    <li key={index} className="flex items-center gap-2 text-muted">
+                      <Check className="w-4 h-4 text-success" />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             {/* Quantity and Actions */}
             <div className="space-y-4">
@@ -351,14 +305,18 @@ const ProductDetail = () => {
               </TabsContent>
               
               <TabsContent value="specifications" className="mt-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {Object.entries(product.specifications).map(([key, value]) => (
-                    <div key={key} className="flex justify-between py-2 border-b border-border">
-                      <span className="font-medium">{key}:</span>
-                      <span className="text-muted">{value}</span>
-                    </div>
-                  ))}
-                </div>
+                {product.specifications ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {Object.entries(product.specifications).map(([key, value]) => (
+                      <div key={key} className="flex justify-between py-2 border-b border-border">
+                        <span className="font-medium">{key}:</span>
+                        <span className="text-muted">{value}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-muted">No specifications available.</p>
+                )}
               </TabsContent>
               
               <TabsContent value="reviews" className="mt-6">

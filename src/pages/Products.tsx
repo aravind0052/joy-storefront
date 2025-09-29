@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,7 +16,7 @@ import {
   SlidersHorizontal,
   X
 } from "lucide-react";
-import featuredProductsImage from "@/assets/featured-products.jpg";
+import { products, categories, brands, filterProducts, sortProducts, searchProducts } from "@/data/staticData";
 
 const Products = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -27,97 +27,27 @@ const Products = () => {
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState("featured");
 
-  // Mock data for products
-  const allProducts = [
-    {
-      id: "1",
-      name: "Premium Wireless Headphones",
-      price: 2999,
-      originalPrice: 3999,
-      image: featuredProductsImage,
-      rating: 4.5,
-      reviews: 128,
-      category: "Electronics",
-      brand: "AudioTech",
-      isOnSale: true,
-      isFeatured: true,
-    },
-    {
-      id: "2",
-      name: "Smart Fitness Watch",
-      price: 1999,
-      originalPrice: 2499,
-      image: featuredProductsImage,
-      rating: 4.3,
-      reviews: 89,
-      category: "Wearables",
-      brand: "FitPro",
-      isOnSale: true,
-    },
-    {
-      id: "3",
-      name: "Professional Camera Lens",
-      price: 15999,
-      image: featuredProductsImage,
-      rating: 4.8,
-      reviews: 45,
-      category: "Photography",
-      brand: "LensMaster",
-      isFeatured: true,
-    },
-    {
-      id: "4",
-      name: "Gaming Mechanical Keyboard",
-      price: 4999,
-      originalPrice: 5999,
-      image: featuredProductsImage,
-      rating: 4.6,
-      reviews: 203,
-      category: "Gaming",
-      brand: "GameGear",
-      isOnSale: true,
-    },
-    {
-      id: "5",
-      name: "Wireless Gaming Mouse",
-      price: 1599,
-      image: featuredProductsImage,
-      rating: 4.4,
-      reviews: 156,
-      category: "Gaming",
-      brand: "GameGear",
-    },
-    {
-      id: "6",
-      name: "Professional Laptop Stand",
-      price: 2499,
-      originalPrice: 2999,
-      image: featuredProductsImage,
-      rating: 4.2,
-      reviews: 78,
-      category: "Accessories",
-      brand: "DeskPro",
-      isOnSale: true,
-    },
-  ];
-
-  const categories = [
-    { name: "Electronics", count: 45 },
-    { name: "Wearables", count: 23 },
-    { name: "Photography", count: 18 },
-    { name: "Gaming", count: 34 },
-    { name: "Accessories", count: 67 },
-    { name: "Mobile", count: 89 },
-  ];
-
-  const brands = [
-    { name: "AudioTech", count: 12 },
-    { name: "FitPro", count: 8 },
-    { name: "LensMaster", count: 15 },
-    { name: "GameGear", count: 23 },
-    { name: "DeskPro", count: 9 },
-    { name: "TechCorp", count: 18 },
-  ];
+  // Get filtered and sorted products using static data
+  const filteredProducts = useMemo(() => {
+    let result = products;
+    
+    // Apply search filter
+    if (searchQuery.trim()) {
+      result = searchProducts(searchQuery);
+    }
+    
+    // Apply filters
+    result = filterProducts({
+      categories: selectedCategories.length > 0 ? selectedCategories : undefined,
+      brands: selectedBrands.length > 0 ? selectedBrands : undefined,
+      priceRange: priceRange as [number, number]
+    });
+    
+    // Apply sorting
+    result = sortProducts(result, sortBy);
+    
+    return result;
+  }, [searchQuery, selectedCategories, selectedBrands, priceRange, sortBy]);
 
   const handleCategoryChange = (category: string, checked: boolean) => {
     if (checked) {
@@ -349,7 +279,7 @@ const Products = () => {
             {/* Results Count */}
             <div className="flex items-center justify-between mb-6">
               <p className="text-muted">
-                Showing {allProducts.length} of {allProducts.length} products
+                Showing {filteredProducts.length} of {products.length} products
               </p>
             </div>
 
@@ -359,7 +289,7 @@ const Products = () => {
                 ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' 
                 : 'grid-cols-1'
             }`}>
-              {allProducts.map((product) => (
+              {filteredProducts.map((product) => (
                 <ProductCard key={product.id} {...product} />
               ))}
             </div>

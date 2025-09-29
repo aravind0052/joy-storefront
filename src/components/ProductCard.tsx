@@ -47,7 +47,10 @@ const ProductCard = ({
         {/* Product Image */}
         <div className="aspect-square overflow-hidden bg-background-soft">
           <img
-            src={image}
+            src={image.startsWith('/api/placeholder') 
+              ? `https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop&crop=center`
+              : image
+            }
             alt={name}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
